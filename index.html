@@ -1,0 +1,164 @@
+<html>
+<head>
+	<script language="JavaScript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script language="JavaScript" type="text/javascript">
+	$(document).ready(function(){
+	    console.log("doc ready");
+	    //ensure that the submit button is disabled at page load.
+	    $("#dataSubmit").prop('disabled', true);
+	});
+	</script>
+</head>
+<body>
+
+	<!-- <button type="button" onClick="test()">Click Me!</button> -->
+	<!-- <div id="c1"></div> -->
+	<!--<div id="c2">Replicating</div> -->
+
+
+	<div id="maincontainer">
+		<div id="maincontainerheader">
+			<h1>Time Table Explorer</h1><br/>
+		</div>
+		<div class="topnav" id="myTopnav">
+			<a class="active" href="#home">Home</a>
+			<a href="#news">News</a>
+			<a href="#contact">Contact</a>
+			<a href="#about">About</a>
+		</div>
+		<div class="tabledata">
+			<!-- add the drop down options -->
+			<div class="input-select">
+				<!-- add the drop down for course -->
+				<div class="course"> 
+					<select name="course" id="course-selector" onchange="onCourseSelect()">
+						<option value="--">--</option>
+						<option value="btech">B.tech</option>
+						<option value="barch">B.Arch</option>
+					</select>
+
+				</div>
+				<!-- add the drop down for year based on the course selected -->
+				<div class="year">
+					<div id="yearbtechlist" style="display:none">
+						<select name="year-btech" id="year-btech"">
+							<option value="1">1st</option>
+							<option value="2">2nd</option>
+							<option value="3">3rd</option>
+							<option value="4">4th</option>
+						</select>
+					</div>
+
+					<div id="yearbarchlist" style="display:none">
+						<select name="year-barch" id="year-barch">
+							<option value="1">1st</option>
+							<option value="2">2nd</option>
+							<option value="3">3rd</option>
+							<option value="4">4th</option>
+							<option value="5">5th</option>
+						</select>						
+					</div>
+
+					
+				</div>
+				<button type="button" id="dataSubmit" onClick="submit()">Click Me!</button>
+			</div>
+			<div id="nodata"></div>
+			<div id="rendered-data"></div>
+		</div>
+	</div>
+
+	
+
+
+
+
+
+
+
+
+	<script>
+
+		function test() {
+			console.log('called method');
+			$.ajax({
+				url:"index.php", //the page containing php script
+				type: "post", //request type,
+				dataType: 'json',
+				data: {registration: $("#c2").text()},
+				success:function(result){
+					console.log(result.abc);
+					$("#c1").text(result.abc);
+					console.log("Value replaced");
+				}
+			});
+		}
+
+
+		/**
+		* Submit this data over to the server from here
+		* using ajax.
+		*/
+		function submit() {
+			console.log($("#course-selector").val());
+			console.log($("#year-barch").val());
+			console.log($("#year-btech").val());
+			$.ajax({
+				url:"index.php", //the page containing php script
+				type: "post", //request type,
+				dataType: 'json',
+				data: {
+					operation: "viewTT",
+					course: $("#course-selector").val(),
+					year_barch: $("#year-barch").val(),
+					year_btech: $("#year-btech").val()
+				}
+			}).done(function(result){
+				console.log(result.results);
+				renderTimeTable(result.results);
+				// console.log("Value replaced");
+			}).fail(function(result){
+				console.log(result.results);
+				$("#nodata").text("Invalid query selected");
+			});
+
+		}
+
+
+
+		function renderTimeTable(encodedData) {
+			decodedData = JSON.parse(encodedData);
+			$("#rendered-data").text(decodedData["mon"]);
+		}
+
+
+		/**
+		* Method that would take care of hiding/unhiding the year selector based
+		* on the year selected by the user.
+		*/
+		function onCourseSelect() {
+			if($("#course-selector").val() == "btech") {
+				//make the btech year selector visible and all others false
+				document.getElementById("yearbarchlist").style.display = "none";
+				document.getElementById("yearbtechlist").style.display = "block";
+				$("#dataSubmit").prop('disabled', false);
+			
+			} else if($("#course-selector").val() == "barch") {
+				document.getElementById("yearbtechlist").style.display = "none";
+				document.getElementById("yearbarchlist").style.display = "block";
+				$("#dataSubmit").prop('disabled', false);
+			
+			} else {
+				document.getElementById("yearbtechlist").style.display = "none";
+				document.getElementById("yearbarchlist").style.display = "none";
+				$("#dataSubmit").prop('disabled', true);
+			}
+		}
+
+
+	</script>
+
+
+</body>
+
+</html>
