@@ -35,7 +35,7 @@ function viewTimeTable() {
 	if($course == "btech") {
 		$year = $_POST["year_btech"];
 		//sanitize and make sql calls
-		return "True enginner";
+		return '{"mon": ["sci", "maths"], "tue": []}';
 
 	} else if($course == "barch") {
 		$year = $_POST["year_barch"];
