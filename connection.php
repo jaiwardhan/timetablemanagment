@@ -65,13 +65,13 @@ function viewTimeTable() {
 	if (!$link) {
     	return '{"status": "none"}';
 	}
-	mysql_select_db('timetableci', $link);
+	mysqli_select_db($link, 'timetableci');
 	
-	$result = mysql_query($fetchSQL, $link);
-	if(mysql_num_rows($result) != 0) {
+	$result = mysqli_query($link, $fetchSQL);
+	if(mysqli_num_rows($result) != 0) {
 		$obj = (object) [];
 		$i=0;
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$obj->$i = $row['schedule'];
 			$i = $i + 1;
 		}
@@ -94,23 +94,23 @@ function doLogin() {
 	$link = getDBConnection();
 	$uname = $_POST["uname"];
 	$pwd = $_POST["pwd"];
-	$uname = mysql_real_escape_string($uname);
-	$pwd = mysql_real_escape_string($pwd);
+	$uname = mysqli_real_escape_string($link, $uname);
+	$pwd = mysqli_real_escape_string($link, $pwd);
 	$loginSql = "SELECT * from users WHERE username='$uname' AND password='$pwd'";
 	if(!$link) {
 		return '{"status": "none"}';
 	}		
 	//select the db
-	if (!mysql_select_db('timetableci', $link)) {
+	if (!mysqli_select_db($link, 'timetableci')) {
 	    return '{"status": "none"}';
 	}	
 
-	$res = mysql_query($loginSql, $link);
-	$rowsresult = mysql_num_rows($res);
+	$res = mysqli_query($link, $loginSql);
+	$rowsresult = mysqli_num_rows($res);
 	if($rowsresult==0 || $rowsresult > 1) {
 		return '{"status": "none"}';
 	}
-	$row = mysql_fetch_assoc($res);
+	$row = mysqli_fetch_assoc($res);
 	$firstName = $row["firstname"];
 	$lastName = $row["lastname"];
 	$uid = $row["uid"];
@@ -162,7 +162,7 @@ function uploadTT() {
     	return '{"connect": 0}';
 	}
 
-	if (!mysql_select_db('timetableci', $link)) {
+	if (!mysqli_select_db($link, 'timetableci')) {
 	    return '{"connect": 0}';
 	}	
 	$baseData = json_decode($_POST["data"]);
@@ -171,11 +171,9 @@ function uploadTT() {
 	$schedule = $baseData->{"periodsData"};
 
 
-	$sql = "SELECT count(*) as c FROM timetable WHERE course='$course' AND day='$day'";
-
-	// $sql = 'SELECT schedule FROM timetable WHERE course='.$course.' and day='.$day;
-	$result = mysql_query($sql, $link);
-	$result = mysql_result($result, 0);
+	$sql = "SELECT schedule FROM timetable WHERE course='$course' and day='$day'";
+	$res = mysqli_query($link, $sql);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
 
 	// return $result."-";
 
@@ -184,7 +182,7 @@ function uploadTT() {
 	if($result==0) {
 		$inssql = "INSERT into timetable (course, day, 	schedule) VALUES ('$course', '$day', '$schedule')";
 
-		$result = mysql_query($inssql);
+		$result = mysqli_query($link, $inssql);
 		if(!$result) {
 			closeDBConnection($link);
 			return '{"connect": -1}';
@@ -196,7 +194,7 @@ function uploadTT() {
 	else {
 		//update the table
 		$updsql = "UPDATE timetable SET schedule = '$schedule' WHERE course = '$course' and day = '$day'";
-		$result = mysql_query($updsql, $link);
+		$result = mysqli_query($link, $updsql);
 		if(!$result) {
 			closeDBConnection($link);
 			return '{"connect": -2}';
@@ -212,13 +210,13 @@ function uploadTT() {
 }
 
 function getDBConnection() {
-	$link = mysql_connect('localhost', 'test', 'test');
+	$link = mysqli_connect('localhost', 'test', 'test');
 	return $link;
 }
 
 function closeDBConnection($link) {
 	if($link) {
-		mysql_close($link);
+		mysqli_close($link);
 	}
 }
 

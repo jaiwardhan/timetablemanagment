@@ -1,41 +1,15 @@
 <?php
 
 	function getDBConnection() {
-		$link = mysql_connect('127.0.0.1', 'test', 'test');
+		$link = mysqli_connect('127.0.0.1', 'test', 'test');
 		return $link;
 	}
 
 	function closeDBConnection($link) {
 		if($link) {
-			mysql_close($link);
+			mysqli_close($link);
 		}
 	}
-
-	// $link = getDBConnection();
-	// echo("link acquired".PHP_EOL);
-	// mysql_select_db('timetableci', $link);
-	// $uname = 'jai@g.com';
-	// $pwd = 'root';
-	// $loginSql = "SELECT count(*) as c from users WHERE username='$uname' AND password='$pwd'";
-	// $link = getDBConnection();
-	// if(!link) {
-	// 	return '{"status": "none"}';
-	// }		
-	// //select the db
-	// if (!mysql_select_db('timetableci', $link)) {
-	//     return '{"status": "none"}';
-	// }	
-	// echo("starting query");
-	// $res = mysql_query($loginSql, $link);
-	// $result = mysql_result($res, 0);
-	// if($result==0 || $result > 1) {
-	// 	echo("found");
-	// 	return '{"status": "none"}';
-	// }
-	// echo("none found babe");
-	// return '{"status": "ok"}';
-
-
 
 	// $uname = 'jai@g.com';
 	// $pwd = 'root';
@@ -99,36 +73,39 @@
 
 	// return json_encode($obj);
 
-
-
 	/**
  * Checks if the user has appropriate permissions or not
  * by checing the data base.
  */
 function doLogin() {
 	$link = getDBConnection();
-	$uname = "jai@g.com";
-	$pwd = "root";
+	$uname = 'jai@g.com';
+	$pwd = 'root';
+	$uname = mysqli_real_escape_string($link, $uname);
+	$pwd = mysqli_real_escape_string($link, $pwd);
 	$loginSql = "SELECT * from users WHERE username='$uname' AND password='$pwd'";
 	if(!$link) {
-		return '{"status": "none"}';
+		 tell('{"status": "none"}');
 	}		
 	//select the db
-	if (!mysql_select_db('timetableci', $link)) {
-	    return '{"status": "none"}';
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    tell('{"status": "none"}');
 	}	
 
-	$res = mysql_query($loginSql, $link);
-	$rowsresult = mysql_num_rows($res);
+	$res = mysqli_query($link, $loginSql);
+	$rowsresult = mysqli_num_rows($res);
 	if($rowsresult==0 || $rowsresult > 1) {
-		return '{"status": "none"}';
+		tell( '{"status": "none"}');
 	}
-	$row = mysql_fetch_assoc($res);
+	$row = mysqli_fetch_assoc($res);
 	$firstName = $row["firstname"];
 	$lastName = $row["lastname"];
 	$uid = $row["uid"];
 	$status = "status";
+	//Store all of it in the session.
 	$_SESSION['user_session'] = $uid;
+	$_SESSION['fname'] = $firstName;
+	$_SESSION['lname'] = $lastName;
 	$fn="firstName";
 	$ln="lastName";
 	$u="uid";
@@ -138,21 +115,100 @@ function doLogin() {
 	$obj->$u = $uid;
 	$obj->$status = "ok";
 	closeDBConnection($link);
-	echo(json_encode($obj).PHP_EOL);
+	tell(json_encode($obj));
 
 }
 
 
-function isLoggedIn() {
-	if(isset($_SESSION['user_session'])) {
-		echo('{"status": "ok"}'.PHP_EOL);
-	} else {
-		echo('{"status"; "none"}'.PHP_EOL);
+
+/**
+ * Tries to update the DB table with the new time table.
+ * If the entry is not there already, then creates a new entry 
+ * and does and INSERT to the table. If it exists, then does an
+ * UPDATE to the table and overrwirtes it (the day row).
+ */
+function uploadTT() {
+
+	$link = getDBConnection();
+	if (!$link) {
+    	tell( '{"connect": 0}');
 	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    tell( '{"connect": 0}');
+	}	
+	$baseData = json_decode('{"course":"btech4","day":"MON","periodsData":"[\"ABC\",\"ABC\",\"ABC\",\"ABC\",\"ABC\",\"ABC\",\"ABC\",\"ABC\"]"}');
+	$course = $baseData->{"course"};
+	$day = $baseData->{"day"};
+	$schedule = $baseData->{"periodsData"};
+	tell('day is: '.$day);
+	tell('course is: '.$course);
+	tell('sch is: '.$schedule);
+
+	//$sql = "SELECT count(*) as c FROM timetable WHERE course='$course' AND day='$day'";
+
+	$sql = "SELECT schedule FROM timetable WHERE course='$course' and day='$day'";
+	$res = mysqli_query($link, $sql);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+	tell("rows found: ".$result);
+
+	// return $result."-";
+
+	//check if a valid result was obtained
+	//if not, then insert, else overwrite
+	if($result==0) {
+		$inssql = "INSERT into timetable (course, day, 	schedule) VALUES ('$course', '$day', '$schedule')";
+
+		$result = mysqli_query($link, $inssql);
+		if(!$result) {
+			closeDBConnection($link);
+			tell( '{"connect": -1}');
+		} else {
+			closeDBConnection($link);
+			tell( '{"connect": 1}');
+		}
+	} 
+	else {
+		//update the table
+		$updsql = "UPDATE timetable SET schedule = '$schedule' WHERE course = '$course' and day = '$day'";
+		$result = mysqli_query($link, $updsql);
+		if(!$result) {
+			closeDBConnection($link);
+			tell( '{"connect": -2}');
+		} else {
+			closeDBConnection($link);
+			tell( '{"connect": 2}');
+		}
+	}
+
+
+	// closeDBConnection($link);
+	// tell( '{"connect": 3}');
 }
 
-doLogin();
-isLoggedIn();
 
+
+// doLogin();
+uploadTT();
+
+
+function tell($data) {
+	echo($data.PHP_EOL);
+}
+
+// function isLoggedIn() {
+// 	if(isset($_SESSION['user_session'])) {
+// 		echo('{"status": "ok"}'.PHP_EOL);
+// 	} else {
+// 		echo('{"status"; "none"}'.PHP_EOL);
+// 	}
+// }
+
+// doLogin();
+// isLoggedIn();
+
+
+//Comment everything but the line below to see the php version you are running in the browser.
+// phpinfo();
 
 ?>

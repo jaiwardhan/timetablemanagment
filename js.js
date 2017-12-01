@@ -294,7 +294,7 @@ function uploadData() {
 	}
 	//serialize and add subjects to the payload.
 	upd["periodsData"] = JSON.stringify(str);
-	
+	console.log(JSON.stringify(upd));
 	//POST to server
 	$.ajax({
 		url:"connection.php", //the page containing php script
@@ -358,6 +358,7 @@ function submit() {
 			renderTimeTable(result.results, course, barchyear, btechyear);
 		} else {
 			alert("No data found");
+			removeAllChildNodes("rendered-data");
 		}
 		console.log(result.results);
 		// console.log("Value replaced");
