@@ -1,29 +1,15 @@
 <?php
 session_start();
 
-//fetch the operation, based on the options sent,
-//execute the corresponding section.
-// $servername = "localhost";
-// $username = "username";
-// $password = "password";
-
-// // Create connection
-// $conn = new mysqli($servername, $username, $password);
-
-// // Check connection
-// if ($conn->connect_error) {
-//     die("Connection failed: " . $conn->connect_error);
-// } 
-// echo "Connected successfully";
-
-
+//only works if the payload has an operation variable.
 if(isset($_POST['operation'])) {
 	$operation = $_POST['operation'];
 	echo json_encode(array("results"=>process($operation)));
 }
 
 
-
+//Processes the sent input and basically
+//distributes the work to the desired method accordingly.
 function process($operation) {
 	$result = false;
 	switch ($operation) {
@@ -129,6 +115,7 @@ function doLogin() {
 	$lastName = $row["lastname"];
 	$uid = $row["uid"];
 	$status = "status";
+	//Store all of it in the session.
 	$_SESSION['user_session'] = $uid;
 	$_SESSION['fname'] = $firstName;
 	$_SESSION['lname'] = $lastName;
@@ -161,6 +148,13 @@ function isLoggedIn() {
 	return '{"status": "none"}';
 }
 
+
+/**
+ * Tries to update the DB table with the new time table.
+ * If the entry is not there already, then creates a new entry 
+ * and does and INSERT to the table. If it exists, then does an
+ * UPDATE to the table and overrwirtes it (the day row).
+ */
 function uploadTT() {
 
 	$link = getDBConnection();

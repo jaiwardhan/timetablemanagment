@@ -1,3 +1,10 @@
+/**
+ * Global var for all the subjects per year. The name of each list (eg. btech1, barch1 etc) are
+ * nothing but the concatenated codes of (course+year). Incase if you want to add more courses
+ * and the corresponding subjects, add your vars here and they will be dynamically populated.
+ * Also please keep in mind that LUNCH and HOLIDAY are mandatorily kept as part of subjects
+ * to handle other cases of the time table schedule.
+ */
 var subjects = {
 	btech1: ["BCME", "BEE", "ED", "HUM", "LUNCH", "CVIS", "EELAB", "MELAB", "CSLAB", "HOLIDAY"],
 	btech2: ["ABC", "ABD", "ABCDD", "ASDS", "LUNCH", "ASD", "SDF", "WERTR", "WERRR", "HOLIDAY"],
@@ -11,17 +18,27 @@ var subjects = {
 	barch5: ["BARABC", "ABD", "BARABCDD", "ASDS", "LUNCH", "BARASD", "SDF", "BARWERTR", "BARWERRR", "HOLIDAY"]
 };
 
+/** The operatable weekdays */
 var weekdays = ["MON", "TUE", "WED", "THU", "FRI"];
-
+/** Constant */
 var totalPeriodsPerDay = 8;
-
+/** Global var - donot touch */
 var cc = "";
 
+
+/**
+ * Listener when the user wants to view the time table.
+ */
 function onViewTT() {
 	document.getElementById("view-tt-layout").style.display = "block";
 	document.getElementById("update-tt-layout").style.display = "none";
 }
 
+/**
+ * Listener when the user wants to update the time table. Checks if
+ * the user is session logged in, and only then proceedes ahead, else
+ * throws an error alert dialog.
+ */
 function onUpdateAttemptTT() {
 	isLoggedIn(function() {
 		document.getElementById("view-tt-layout").style.display = "none";
@@ -33,12 +50,17 @@ function onUpdateAttemptTT() {
 
 
 
-
-
+/**
+ * Method which dynamically generates and renders the time table. Adds
+ * table headers, days amd periods as part of the table. Also the time
+ * -table data is generally encoded, so we need to decode it to get a 
+ * structured data and then parse and render it accordingly.
+ */ 
 function renderTimeTable(encodedData, course, btyear, baryear) {
 	var year = (course=="btech")?btyear:baryear;
 
 	decodedData = JSON.parse(encodedData);
+	//this div will be finally appended to the render div
 	var div = document.createElement("div");
 	var headDiv = document.createElement("div");
 	headDiv.appendChild(document.createTextNode("Course: "+course+", Year: "+year));
@@ -213,6 +235,11 @@ function onSelectInsYear(data) {
 	}
 }
 
+
+/**
+ * Helper which removes all the child nodes of an
+ * id by its name.
+ */
 function removeAllChildNodes(idName) {
 	var elem = document.getElementById(idName);
 	if(elem) {
@@ -223,6 +250,10 @@ function removeAllChildNodes(idName) {
 	}
 }
 
+
+/**
+ * Creates a select drop down with options from the subjects.
+ */
 function createPeriodOption(subs) {
 	var select = document.createElement("select");
 
@@ -239,31 +270,46 @@ function createPeriodOption(subs) {
 }
 
 
+
+/**
+ * The Method!! Uploads the data to the server by injecting
+ * the data params as a serialized json payload, and a post call
+ * via AJAX to the server.
+ */
 function uploadData() {
-	
+	//the payload. Contains the course being
+	//tried to update/overwritten for, the day
+	//and the periods data selected out of the drop
+	//downs.
 	var upd = {
 		"course": cc,
 		"day": $("#"+cc+"day").val(),
 		"periodsData": ""
 	}
 	var str = [];
+	//push all the selected subjects on that day
+	//into an array using jquery.
 	for(var i = 0; i < 8; ++i) {
 		str.push($("#"+cc+"period"+i).val());
 	}
+	//serialize and add subjects to the payload.
 	upd["periodsData"] = JSON.stringify(str);
+	
 	//POST to server
-	console.log(JSON.stringify(upd));
 	$.ajax({
 		url:"connection.php", //the page containing php script
 		type: "post", //request type,
 		dataType: 'json',
 		data: {
-			operation: "uploadTT",
-			data: JSON.stringify(upd)
+			operation: "uploadTT",	//operation to be looking for 
+			data: JSON.stringify(upd)	//serialize the data again to a string
 		}
 	}).done(function(result){
-		console.log("Succ");
-		console.log(result.results);
+		// console.log("Succ");
+		// console.log(result.results);
+
+		//since there is a response from server, deserialize
+		//and check if status is ok.
 		decodedData = JSON.parse(result.results);
 		if(decodedData["connect"] == 0)  {
 			alert("Failed to write data.");
@@ -287,9 +333,10 @@ function uploadData() {
 }
 
 /**
-* Submit this data over to the server from here
-* using ajax.
-*/
+ * The Method which fetches the timetable form the
+ * server when asked by any user. Takes a combination of 
+ * the course and the year.
+ */
 function submit() {
 	var course = $("#course-selector").val();
 	var barchyear = $("#year-barch").val();
@@ -323,6 +370,12 @@ function submit() {
 }
 
 
+
+/**
+ * Method which tries doing the login and ensures that the page
+ * is rendered according to the login status. All updates are done on
+ * the same page and no redirects are performed.
+ */
 function doLogin(formData) {
 	$.ajax({
 		url:"connection.php", //the page containing php script
@@ -337,18 +390,28 @@ function doLogin(formData) {
 		var res = JSON.parse(result.results);
 		console.log(res);
 		if(res['status']=="ok") {
+			//we would want the uname/pwd box to close on
+			//its own.
 			$('#login-content').slideToggle();
 		    $(this).toggleClass('active');          
 	    
 	    	if ($(this).hasClass('active')) $(this).find('span').html('&#x25B2;')
 	      	else $(this).find('span').html('&#x25BC;')
 			document.getElementById("incorrect-login").style.display = "none";
+			
+			//also that when the box is opened, the button should now tell the user
+			//to log out with the same button action.
 			document.getElementById("submitlogin").value = "Log Out";
+			
+			//the box should now welcome the user by fetching his name from the
+			//recieved payload
 			document.getElementById("login-trigger").innerHTML="Welcome, "+res['firstName']+" "+res['lastName'];
 			document.getElementById("inputs").style.display = "none";
+			//and the button call should now do a logout action when clicked.
 			document.getElementById("submitlogin").onclick = doLogout;
 
 		} else {
+			//tell the user its an incorrect login.
 			document.getElementById("incorrect-login").style.display = "block";	
 			document.getElementById("inputs").style.display = "block";
 		}
@@ -360,6 +423,11 @@ function doLogin(formData) {
 }
 
 
+
+/**
+ * Does a logout when requested for. Essentially destroys the user 
+ * session and reloads the page if success.
+ */
 function doLogout() {
 	$.ajax({
 		url:"connection.php", //the page containing php script
@@ -376,6 +444,12 @@ function doLogout() {
 	});
 }
 
+
+/**
+ * Helper to check if the user is logged in. Since this is a post call
+ * hence we may want further processing after the post has been processed.
+ * Hence supports two callbacks in either case if the user is logged in or not.
+ */
 function isLoggedIn(callbackSucc, callbackFail) {
 	$.ajax({
 		url:"connection.php", //the page containing php script
@@ -386,12 +460,12 @@ function isLoggedIn(callbackSucc, callbackFail) {
 		}
 	}).done(function(result) {
 		var res = JSON.parse(result.results);
-		console.log("isLoggedIn: done");
+		// console.log("isLoggedIn: done");
 		if(res["status"]=="ok") {
 			console.log("isLoggedIn: loginok");
 			//alert("Is logged in");
 			if(callbackSucc) {
-				console.log("isLoggedIn: execing callback"); 
+				// console.log("isLoggedIn: execing callback"); 
 				callbackSucc();
 			}
 			
@@ -409,6 +483,13 @@ function isLoggedIn(callbackSucc, callbackFail) {
 }
 
 
+/**
+ * Sets the status of the login button based on if the user is already
+ * session logged in or not. Since that is a POST, hence we go ahead and
+ * support two callbacks which process when the post is complete. This method
+ * is called when the page is loaded again and we wanna see if the user was still
+ * in session active mode.
+ */
 function setLoginButtonStatus(callbackOnSuccess, callbackOnFailure) {
 	isLoggedIn(function () {
 		console.log("setLoginButtonStatus: true");
@@ -437,6 +518,12 @@ function setLoginButtonStatus(callbackOnSuccess, callbackOnFailure) {
 	}); 
 }
 
+
+/**
+ * Gets the full name of the logged in user from the
+ * session data. Since this is a post call check, hence we pass
+ * the divname whose text value has to be updated with the user's name.
+ */
 function setFullNameFromSession(divName) {
 	isLoggedIn(function() {
 		$.ajax({
@@ -462,7 +549,7 @@ function setFullNameFromSession(divName) {
 
 
 //----------------- tabs below -----------------------------
-function openCity(evt, cityName) {
+function openTabOps(evt, cityName) {
     // Declare all variables
     var i, tabcontent, tablinks;
 
