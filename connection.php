@@ -108,6 +108,8 @@ function doLogin() {
 	$link = getDBConnection();
 	$uname = $_POST["uname"];
 	$pwd = $_POST["pwd"];
+	$uname = mysql_real_escape_string($uname);
+	$pwd = mysql_real_escape_string($pwd);
 	$loginSql = "SELECT * from users WHERE username='$uname' AND password='$pwd'";
 	if(!$link) {
 		return '{"status": "none"}';
