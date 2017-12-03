@@ -27,7 +27,12 @@
 	    });
 	    //check if the session was already live and set the
 	    //status of login button accordingly
-	    setLoginButtonStatus(null, function() {document.getElementById("incorrect-login").style.display = "none";});
+	    setLoginButtonStatus(function() {
+	    	document.getElementById("register-now").style.display = "none";
+	    }, function() {
+	    	document.getElementById("incorrect-login").style.display = "none";
+	    	document.getElementById("register-now").style.display = "block";
+	    });
 	    //make sure that the home tab is clicked by def 
 	    //on page load complete.
 	    document.getElementById("defaultOpen").click();
@@ -62,6 +67,7 @@
 					</fieldset>
 				</form>
 				<div id="incorrect-login" style="display:none">Login Incorrect</div>
+				<div id="register-now" style="display:block"><a href="register.php">Register Now</a></div>
 			  </div>                     
 			</li>
 		  </ul>

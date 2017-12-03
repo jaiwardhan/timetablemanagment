@@ -33,6 +33,10 @@ function process($operation) {
 			$result = isLoggedIn();
 			break;
 
+		case 'doRegister':
+			$result = doRegister();
+			break;
+		
 		case 'getFullNameFromSession':
 			$result = getFullNameFromSession();
 		default:
@@ -227,6 +231,69 @@ function getFullNameFromSession() {
 		$lname = $_SESSION['lname'];
 		return $fname." ".$lname;
 	}
+}
+
+
+function doRegister() {
+
+	$link = getDBConnection();
+	if (!$link) {
+    	return '{"connect": 0}';
+	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    return '{"connect": 0}';
+	}	
+
+	$username = $_POST["uname"];
+	$password = $_POST["pwd"];
+	$firstname = $_POST["fname"];
+	$lastname = $_POST["lname"];
+
+	//we can only register if the user is not there in
+	//the users table.
+	$checkuserSQL = "SELECT * FROM users WHERE username='$username'";
+	$res = mysqli_query($link, $checkuserSQL);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+	//if there waas no existing user, then we can go ahead and update or overwrite
+	//in the registrations database.
+	if($result==0) {
+		//check if this user already has an entry in the registrations table
+		$chkRedg = "SELECT * FROM registrations WHERE username='$username' and password='$password'";
+		$res = mysqli_query($link, $chkRedg);
+		$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+		//if not existing then insert
+		if($result==0) {
+			$insSQL = "INSERT into registrations (username, password, firstname, lastname) 
+						VALUES ('$username', '$password', '$firstname', '$lastname')";
+			$result = mysqli_query($link, $insSQL);
+			if(!$result) {
+				closeDBConnection($link);
+				return '{"status": "rejected"}';
+			} else {
+				closeDBConnection($link);
+				return '{"status": "success"}';
+			}
+		} else {
+			closeDBConnection($link);
+			return '{"status": "confirmpending"}';
+		}
+
+	} 
+	else {
+		//return status as existing user
+		closeDBConnection($link);
+		return '{"status": "existing"}';
+	}
+
+
+	closeDBConnection($link);
+	return '{"connect": 3}';
+
+
+
+
+	return '{"status": "ok"}';
 }
 
 

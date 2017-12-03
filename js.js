@@ -410,6 +410,7 @@ function doLogin(formData) {
 			document.getElementById("inputs").style.display = "none";
 			//and the button call should now do a logout action when clicked.
 			document.getElementById("submitlogin").onclick = doLogout;
+			document.getElementById("register-now").style.display = "none";
 
 		} else {
 			//tell the user its an incorrect login.
@@ -548,7 +549,6 @@ function setFullNameFromSession(divName) {
 
 
 
-
 //----------------- tabs below -----------------------------
 function openTabOps(evt, cityName) {
     // Declare all variables
@@ -570,3 +570,77 @@ function openTabOps(evt, cityName) {
     document.getElementById(cityName).style.display = "block";
     evt.currentTarget.className += " active";
 }
+
+
+
+
+//---------------------- register js below
+/**
+ * Method which tries doing the login and ensures that the page
+ * is rendered according to the login status. All updates are done on
+ * the same page and no redirects are performed.
+ */
+function doRegister(formData) {
+	console.log("registering");
+	console.log(formData.mailid.value);
+	console.log(formData.password.value);
+	console.log(formData.fname.value);
+	console.log(formData.lname.value);
+	$.ajax({
+		url:"connection.php", //the page containing php script
+		type: "post", //request type,
+		dataType: 'json',
+		data: {
+			operation: "doRegister",
+			uname: formData.mailid.value,
+			pwd: formData.password.value,
+			fname: formData.fname.value,
+			lname: formData.lname.value
+		}
+	}).done(function(result){
+		var res = JSON.parse(result.results);
+		console.log(res);
+		if(res['status']=="success") {
+			//confirm with a toaster.
+			//add callback to toaster so that it takes you back to the
+			//home page
+			confirmToaster(null, function() {
+				setTimeout(function(){
+				 	window.location.replace('index.php');
+				}, 4000);
+			});
+
+		} else if(res['status']=="confirmpending") {
+			//tell the user its pending
+			confirmToaster("Your input is awaiting pending", function() {
+				setTimeout(function(){
+				 	window.location.replace('index.php');
+				}, 4000);
+			});
+		} else {
+			//tell the user its an incorrect login.
+			alert("Your input was rejected by the server");
+		}
+	}).fail(function(result){
+		alert("failed call for login");
+	});
+	
+}
+
+function confirmToaster(text, callback) {
+	// Get the snackbar DIV
+    var x = document.getElementById("cnf-toaster")
+
+    // Add the "show" class to DIV
+    x.className = "show";
+    if(text!=null) {
+    	x.innerHTML = text;
+    }
+
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    if(callback!=null) {
+    	callback();
+    }
+}
+
