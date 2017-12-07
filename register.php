@@ -8,6 +8,7 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="css/register.css">
 	<link rel="stylesheet" type="text/css" href="css/styes.css">
+	<link rel="stylesheet" type="text/css" href="css/commons.css">
 	<script language="JavaScript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="js.js"></script>
 	<title>Register User</title>
@@ -24,6 +25,9 @@
 	<span class="fontawesome-lock"></span>
 	<input type="password" name="password" id="password" required placeholder="password" autocomplete="off">  
 	<input type="button" value="Submit for validation" id="registersubmit" onclick="doRegister(this.form)">
+
+	<br/><br/>
+	<a href="./index.php" style="color:white">Home</a>
 </form>
 
 <!-- The actual snackbar -->

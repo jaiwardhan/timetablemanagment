@@ -5,6 +5,7 @@
 <head>
 	<!-- link the style sheets, google fonts and jq here -->
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" type="text/css" href="css/commons.css">
 	<link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
 	<script language="JavaScript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="js.js"></script>
@@ -29,10 +30,13 @@
 	    //status of login button accordingly
 	    setLoginButtonStatus(function() {
 	    	document.getElementById("register-now").style.display = "none";
+	    	checkAdminStatus();
 	    }, function() {
 	    	document.getElementById("incorrect-login").style.display = "none";
 	    	document.getElementById("register-now").style.display = "block";
+	    	document.getElementById("approval-bt").style.display = "none";
 	    });
+
 	    //make sure that the home tab is clicked by def 
 	    //on page load complete.
 	    document.getElementById("defaultOpen").click();
@@ -92,6 +96,7 @@
 			<button class="tablinks" id="defaultOpen" onclick="openTabOps(event, 'home')">Home</button>
 			<button class="tablinks" onclick="openTabOps(event, 'contactus')">Contact Us</button>
 			<button class="tablinks" onclick="openTabOps(event, 'timetableview')">Schedule</button>
+			<button class="tablinks" id="approval-bt" onclick="openTabOps(event, 'approvalview')">Approvals</button>
 		</div>
 
 		<!-- the elements of the tab navigation, explained -->
@@ -224,7 +229,38 @@
 
 			</div>
 		</div>
+
+		<div id="approvalview" class="tabcontent">
+			<div id="approvalview-pending-no">
+				<div class="alert alert-block">
+			  		<h4 class="alert-heading">Awesome!</h4>
+			  		No pending approvals!
+				</div>	
+			</div>
+
+			<div id="approvalview-pending-yes">
+				<!-- to be dynamically populated -->
+
+			</div>
+			<!-- 
+			<div class="alert alert-success">
+			  <strong>Well done!</strong> You successfully read this important alert message.<button class="yes">No</button><button class="yes">Submit</button>
+			</div>
+
+			<div class="alert alert-error">
+			  <strong>Oh Snap!</strong> Change a few things up and try submitting again.
+			</div>
+
+			<div class="alert alert-info">
+			  <strong>Heads Up!</strong> This alert needs your attention, but it's not super important.
+			</div>
+			 -->
+		</div>
 	</div>
+
+
+	<!-- The actual snackbar -->
+	<div id="cnf-toaster">Thank you for registering <br/>The Webmaster will confirm shortly</div>
 
 	
 

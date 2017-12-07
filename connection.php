@@ -39,6 +39,24 @@ function process($operation) {
 		
 		case 'getFullNameFromSession':
 			$result = getFullNameFromSession();
+			break;
+
+		case 'fetchpending':
+			$result = fetchPendingNotifications();
+			break;
+
+		case 'confirmApprovalForApplier':
+			$result = confirmApprovalForApplier();
+			break;
+
+		case 'rejectApprovalForApplier':
+			$result = rejectApprovalForApplier(null);
+			break;
+
+		case 'isAdmin':
+			$result = isAdmin(false);
+			break;
+
 		default:
 			break;
 	}
@@ -117,12 +135,14 @@ function doLogin() {
 	$row = mysqli_fetch_assoc($res);
 	$firstName = $row["firstname"];
 	$lastName = $row["lastname"];
+	$rights = $row["permission"];
 	$uid = $row["uid"];
 	$status = "status";
 	//Store all of it in the session.
 	$_SESSION['user_session'] = $uid;
 	$_SESSION['fname'] = $firstName;
 	$_SESSION['lname'] = $lastName;
+	$_SESSION['level'] = $rights;
 	$fn="firstName";
 	$ln="lastName";
 	$u="uid";
@@ -150,6 +170,23 @@ function isLoggedIn() {
 		return '{"status": "ok"}';
 	}
 	return '{"status": "none"}';
+}
+
+
+function isAdmin($returnBool) {
+	$result = '{"status": "none"}';
+	if(isset($_SESSION['user_session']) && isset($_SESSION["level"]) && $_SESSION["level"]=="root") {
+		if($returnBool) {
+			$result = true;
+		} else {
+			$result = '{"status": "ok"}';
+		}
+	} else {
+		if($returnBool == true) {
+			$result = false;
+		}
+	}
+	return $result;
 }
 
 
@@ -184,15 +221,22 @@ function uploadTT() {
 	//check if a valid result was obtained
 	//if not, then insert, else overwrite
 	if($result==0) {
-		$inssql = "INSERT into timetable (course, day, 	schedule) VALUES ('$course', '$day', '$schedule')";
+		//also insert permissions are only set to 
+		//the admins, check if this guy is an admin.
+		//If yes then proceed with insert, else with revoke.
+		if(isAdmin(true)==true) {
+			$inssql = "INSERT into timetable (course, day, 	schedule) VALUES ('$course', '$day', '$schedule')";
 
-		$result = mysqli_query($link, $inssql);
-		if(!$result) {
-			closeDBConnection($link);
-			return '{"connect": -1}';
+			$result = mysqli_query($link, $inssql);
+			if(!$result) {
+				closeDBConnection($link);
+				return '{"connect": -1}';
+			} else {
+				closeDBConnection($link);
+				return '{"connect": 1}';
+			}
 		} else {
-			closeDBConnection($link);
-			return '{"connect": 1}';
+			return '{"connect": 3}';
 		}
 	} 
 	else {
@@ -296,5 +340,178 @@ function doRegister() {
 	return '{"status": "ok"}';
 }
 
+
+function fetchPendingNotifications() {
+	$link = getDBConnection();
+	if (!$link) {
+    	return '{"connect": 0}';
+	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    return '{"connect": 0}';
+	}	
+
+	//we can only register if the user is not there in
+	//the users table.
+	$checkuserSQL = "SELECT * FROM registrations";
+	$res = mysqli_query($link, $checkuserSQL);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+	$obj = (object) [];
+	$ss = "status";
+	if($result==0) {
+		$obj->$ss = "none";
+	} 
+	else {
+		$usname = "username";
+		$firstname = "firstname";
+		$lastname = "lastname";
+		
+		$i=0;
+		while($row = mysqli_fetch_assoc($res)) {
+			$obj->$i = new \stdClass(); //create empty container and start pushing data in this
+			$obj->$i->$usname = $row[$usname];
+			$obj->$i->$firstname = $row[$firstname];
+			$obj->$i->$lastname = $row[$lastname];
+			$i = $i + 1;
+		}
+		$obj->$ss = "ok";
+		$len = "length";
+		$obj->$len = $i;
+	}
+	closeDBConnection($link);
+	return json_encode($obj);
+}
+
+function confirmApprovalForApplier() {
+	$link = getDBConnection();
+	if (!$link) {
+    	return '{"connect": 0}';
+	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    return '{"connect": 0}';
+	}	
+
+	//first check if this user is in the registration list or not
+	//if yes, then transfer over to the users list with mod permission
+	//else skip quietly on the page.
+	$username = $_POST["uname"];
+	$checkuserSQL = "SELECT * from registrations WHERE username='$username'";
+	$res = mysqli_query($link, $checkuserSQL);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+
+	$obj = (object) [];
+	$status = "status";
+	//transfer the content data to the users table
+	$usname = "username";
+	$firstname = "firstname";
+	$lastname = "lastname";
+	$password = "password";
+	$perm = "moderator";
+
+	if($result == 0 || $result > 1) {
+		//simply ignore
+		$obj->$status = "ok";
+	} else {
+		$row = mysqli_fetch_assoc($res);
+		//also check if this mail id is already present in the registered user
+		$csql = "SELECT * from users WHERE username='$row[$usname]'";
+		$cres = mysqli_query($link, $csql);
+		$cresult = (!$cres || (mysqli_num_rows($cres))==0)?0:(mysqli_num_rows($cres));
+
+		if($cresult == 0) {
+			$uniqueUID = generateUniqueUserId($link);
+			$insertUserSQL = "INSERT into users (uid, username, password, firstname, lastname, permission) VALUES ('$uniqueUID', '$row[$usname]', '$row[$password]', '$row[$firstname]', '$row[$lastname]', '$perm')";
+			$insres = mysqli_query($link, $insertUserSQL);
+
+			if(!$insres) {
+				$obj->$status = "noins";
+			} else {
+				//remove from the registrations table
+				$delsql = "DELETE FROM registrations WHERE username='$username'";
+				$delres = mysqli_query($link, $delsql);
+				$obj->$status = "ok";
+			}
+
+		} else {
+			//simply ignore
+			$obj->$status = "ok";
+		}
+
+
+	}
+	closeDBConnection($link);
+	return json_encode($obj);
+}
+
+
+function generateUniqueUserId($link) {
+	
+	$uidSQL = "select uid from users";
+	$res = mysqli_query($link, $uidSQL);
+	$uids = array();
+	while($row = mysqli_fetch_assoc($res)) {
+		array_push($uids, $row['uid']);
+	}
+
+	$valueToUse = -1;
+	while(1) {
+		$newrand = mt_rand(1, 74969);
+		if(!in_array($newrand, $uids, true)) {
+			$valueToUse = $newrand;
+			break;
+		}
+	}
+
+	return $valueToUse;
+
+}
+
+
+function rejectApprovalForApplier($link) {
+	$sent = 0;
+	if(!$link) {
+		//then get the connection
+		$link = getDBConnection();
+		if (!$link) {
+	    	return '{"connect": 0}';
+		}
+
+		if (!mysqli_select_db($link, 'timetableci')) {
+		    return '{"connect": 0}';
+		}	
+	} else {
+		$sent = 1;
+	}
+
+
+	$obj = (object) [];
+	$status = "status";
+	//transfer the content data to the users table
+	$usname = "username";
+	$firstname = "firstname";
+	$lastname = "lastname";
+	$password = "password";
+	$perm = "moderator";
+
+
+	//remove from the registrations table
+	$uname = $_POST["uname"];
+	$delsql = "DELETE FROM registrations WHERE username='$uname'";
+	$delres = mysqli_query($link, $delsql);
+	$statadata = "";
+	if(!$delres) {
+		$statadata = "nodel";
+	} else {
+		$statadata = "ok";
+	}
+
+
+	$obj->$status = $statadata;
+	if($sent == 0) {
+		closeDBConnection($link);
+	}
+	return json_encode($obj);
+}
 
 ?>

@@ -44,7 +44,7 @@ function onUpdateAttemptTT() {
 		document.getElementById("view-tt-layout").style.display = "none";
 		document.getElementById("update-tt-layout").style.display = "block";
 	}, function() {
-		alert("Log-in to view this option");
+		confirmToaster("Log-in to view this option");
 	});
 }
 
@@ -180,7 +180,7 @@ function onSelectInsYear(data) {
 	var courseCode = course + year;
 	console.log(courseCode);	//TODO:remove this comment
 	if(year.indexOf("--") >= 0) {
-		alert("Select the proper year");
+		confirmToaster("Select the proper year");
 	} else {
 		//get the dom div to be appended to
 		var div = document.getElementById("course-upload_div");
@@ -312,23 +312,25 @@ function uploadData() {
 		//and check if status is ok.
 		decodedData = JSON.parse(result.results);
 		if(decodedData["connect"] == 0)  {
-			alert("Failed to write data.");
+			confirmToaster("Failed to write data.");
 		} else if(decodedData["connect"] > 0) {
 			if(decodedData["connect"] == 1) {
-				alert("Data insertion succesfull");
+				confirmToaster("Data insertion succesfull");
 			} else if(decodedData["connect"] == 2) {
-				alert("Data overwrite succesfull");
+				confirmToaster("Data overwrite succesfull");
+			} else if(decodedData["connect"] == 3) {
+				confirmToaster("You dont have the necessary rights<br/>to insert a new data record.");
 			}
 		} else if(decodedData["connect"] < 0) {
-			alert("No success with resp: "+decodedData["connect"]);
+			confirmToaster("No success with resp: "+decodedData["connect"]);
 		} else {
-			alert("Unknown response from server.");
+			confirmToaster("Unknown response from server.");
 		}
 		//alert("connection val: "+ decodedData["connect"]);
 		// alert("Upload success");
 	}).fail(function(result){
 		console.log("Fail");
-		alert("Upload failed. Possible backend error.");
+		confirmToaster("Upload failed. Possible backend error.");
 	});
 }
 
@@ -357,7 +359,7 @@ function submit() {
 			// alert("View success");
 			renderTimeTable(result.results, course, barchyear, btechyear);
 		} else {
-			alert("No data found");
+			confirmToaster("No data found with this course combination");
 			removeAllChildNodes("rendered-data");
 		}
 		console.log(result.results);
@@ -416,7 +418,9 @@ function doLogin(formData) {
 			//tell the user its an incorrect login.
 			document.getElementById("incorrect-login").style.display = "block";	
 			document.getElementById("inputs").style.display = "block";
+			document.getElementById("approval-bt").style.display = "none";
 		}
+		checkAdminStatus();
 	}).fail(function(result){
 		alert("failed call for login");
 		document.getElementById("incorrect-login").style.display = "block";
@@ -521,6 +525,38 @@ function setLoginButtonStatus(callbackOnSuccess, callbackOnFailure) {
 }
 
 
+
+/**
+ *	Checks admin status and does what we need to do.
+ */
+function checkAdminStatus(passCallback, failCallback) {
+	$.ajax({
+		url:"connection.php", //the page containing php script
+		type: "post", //request type,
+		dataType: 'json',
+		data: {
+			operation: "isAdmin"
+		}
+	}).done(function(result) {
+		var res = JSON.parse(result.results);
+		// console.log("isLoggedIn: done");
+		if(res["status"]=="ok") {
+			document.getElementById("approval-bt").style.display = "block";
+			if(passCallback!=null) {
+				passCallback();
+			}
+		} else {
+			document.getElementById("approval-bt").style.display = "none";
+			if(failCallback !=  null) {
+				failCallback();
+			}
+		}
+	}).fail(function(result){
+		document.getElementById("approval-bt").style.display = "none";	
+	});
+}
+
+
 /**
  * Gets the full name of the logged in user from the
  * session data. Since this is a post call check, hence we pass
@@ -569,12 +605,16 @@ function openTabOps(evt, cityName) {
     // Show the current tab, and add an "active" class to the button that opened the tab
     document.getElementById(cityName).style.display = "block";
     evt.currentTarget.className += " active";
+
+    if(cityName=="approvalview") {
+    	populatePendingRequests();
+    }
 }
 
 
 
 
-//---------------------- register js below
+//---------------------- register js below ----------------------
 /**
  * Method which tries doing the login and ensures that the page
  * is rendered according to the login status. All updates are done on
@@ -607,7 +647,7 @@ function doRegister(formData) {
 			confirmToaster(null, function() {
 				setTimeout(function(){
 				 	window.location.replace('index.php');
-				}, 4000);
+				}, 3200);
 			});
 
 		} else if(res['status']=="confirmpending") {
@@ -615,11 +655,11 @@ function doRegister(formData) {
 			confirmToaster("Your input is awaiting pending", function() {
 				setTimeout(function(){
 				 	window.location.replace('index.php');
-				}, 4000);
+				}, 3200);
 			});
 		} else {
 			//tell the user its an incorrect login.
-			alert("Your input was rejected by the server");
+			confirmToaster("Your input was rejected by the server");
 		}
 	}).fail(function(result){
 		alert("failed call for login");
@@ -638,9 +678,166 @@ function confirmToaster(text, callback) {
     }
 
     // After 3 seconds, remove the show class from DIV
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2900);
     if(callback!=null) {
     	callback();
     }
+}
+
+
+
+/** ------------------- approval js below -----------------------
+
+/**
+ * method which dynamically injects a user's approval data
+ * into the respective div of the page as another child.
+ */ 
+function insertPendingNotifier(index, data) {
+	var insertionDiv = document.createElement('div');
+	insertionDiv.setAttribute('identifier', index);
+	insertionDiv.setAttribute('id', 'pending'+index);
+	insertionDiv.className += ' alert alert-info';
+	
+	var name = data["firstname"] + " " + data["lastname"];
+	var nameElement = document.createElement('strong');
+	nameElement.appendChild(document.createTextNode(name));
+	insertionDiv.appendChild(nameElement);
+	insertionDiv.appendChild(document.createElement('br'));
+
+	var email = data["username"];
+	var emailelement = document.createElement('i');
+	emailelement.appendChild(document.createTextNode(email + " needs your approval to join as a moderator"));
+	insertionDiv.appendChild(emailelement);
+	
+	var buttonNo = document.createElement('button');
+	buttonNo.className += ' option approval-buttons-no';
+	//append the username to this button uname property
+	buttonNo.setAttribute('uname', email);
+	buttonNo.setAttribute('pendingidx', index);
+	buttonNo.appendChild(document.createTextNode("Dissapprove"));
+	buttonNo.onclick = sendRejectionToServer;
+	var buttonYes = document.createElement('button');
+	buttonYes.className += ' option approval-buttons-yes';
+	//append the username to this button uname property
+	buttonYes.setAttribute('uname', email);
+	buttonYes.setAttribute('pendingidx', index);
+	buttonYes.appendChild(document.createTextNode("Approve"));
+	buttonYes.onclick = sendApprovalToServer;
+	insertionDiv.appendChild(buttonNo);
+	insertionDiv.appendChild(buttonYes);
+
+	//insert into the main div in the page
+	var maindiv = document.getElementById('approvalview-pending-yes');
+	maindiv.appendChild(insertionDiv);
+}
+
+
+
+/**
+ * Method which populates all the pending registration
+ * requests into the respective div of the main page bar section
+ */
+function populatePendingRequests() {
+	console.log("checking");
+	$.ajax({
+		url:"connection.php", //the page containing php script
+		type: "post", //request type,
+		dataType: 'json',
+		data: {
+			operation: "fetchpending"
+		}
+	}).done(function(result){
+		var res = JSON.parse(result.results);
+		console.log(res);
+		if(res['status']=="ok") {
+			var idx = 0;
+			removeAllChildNodes("approvalview-pending-yes");
+			for(;idx < res['length']; ++idx) {
+				console.log('idx '+idx);
+				insertPendingNotifier(idx, res[""+idx]);
+			}
+			document.getElementById('approvalview-pending-no').style.display = "none";
+			document.getElementById('approvalview-pending-yes').style.display = "block";
+		} else {
+			document.getElementById('approvalview-pending-no').style.display = "block";
+			document.getElementById('approvalview-pending-yes').style.display = "none";
+		}
+	}).fail(function(result){
+		alert("failed call for notifications");
+	});
+}
+
+
+/**
+ * Method called when the admin wants to approve a request
+ * in the registration.
+ */ 
+function sendApprovalToServer() {
+	var idx = this.getAttribute('pendingidx');
+	$.ajax({
+		url:"connection.php", //the page containing php script
+		type: "post", //request type,
+		dataType: 'json',
+		data: {
+			operation: "confirmApprovalForApplier",
+			uname: this.getAttribute('uname')
+		}
+	}).done(function(result){
+		var res = JSON.parse(result.results);
+		var userDiv = document.getElementById('pending'+idx);
+		if(res['status']=="ok") {
+			userDiv.className = 'alert alert-success';
+		} else {
+			userDiv.className = 'alert alert-block';
+		}
+		disableColumnById('pending'+idx);
+	}).fail(function(result){
+		alert("Failed call for approval");
+	});
+}
+
+
+/**
+ * Method called when the admin wants to reject a request
+ * in the registration.
+ */ 
+function sendRejectionToServer() {
+	var idx = this.getAttribute('pendingidx');
+	$.ajax({
+		url:"connection.php", //the page containing php script
+		type: "post", //request type,
+		dataType: 'json',
+		data: {
+			operation: "rejectApprovalForApplier",
+			uname: this.getAttribute('uname')
+		}
+	}).done(function(result){
+		var res = JSON.parse(result.results);
+		var userDiv = document.getElementById('pending'+idx);
+		if(res['status']=="ok") {
+			userDiv.className = 'alert alert-error';
+		} else {
+			userDiv.className = 'alert alert-block';
+		}
+		disableColumnById('pending'+idx);
+	}).fail(function(result){
+		alert("failed call for rejection");
+	});
+}
+
+
+
+/**
+ * This method could virtually disable any div passed by
+ * id and all its children as well.
+ */
+function disableColumnById(idName) {
+	var el = document.getElementById(idName);
+	var allChildNodes = el.getElementsByTagName('*');
+	el.disabled = true;
+	for(var i = 0; i < allChildNodes.length; i++) {
+	   allChildNodes[i].disabled = true;
+	}
+	el.className += ' approve-button-disabled';
 }
 

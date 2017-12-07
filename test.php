@@ -250,28 +250,173 @@ function doRegister() {
 }
 
 
+function fetchPendingNotifications() {
+	$link = getDBConnection();
+	if (!$link) {
+    	return '{"connect": 0}';
+	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    return '{"connect": 0}';
+	}	
+
+	//we can only register if the user is not there in
+	//the users table.
+	$checkuserSQL = "SELECT * FROM registrations";
+	$res = mysqli_query($link, $checkuserSQL);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+	$obj = (object) [];
+	$ss = "status";
+	if($result==0) {
+		$obj->$ss = "none";
+	} 
+	else {
+		$usname = "username";
+		$firstname = "firstname";
+		$lastname = "lastname";
+		
+		$i=0;
+		while($row = mysqli_fetch_assoc($res)) {
+			$obj->$i = new \stdClass(); //create empty container and start pushing data in this
+			$obj->$i->$usname = $row[$usname];
+			$obj->$i->$firstname = $row[$firstname];
+			$obj->$i->$lastname = $row[$lastname];
+			$i = $i + 1;
+		}
+		$obj->$ss = "ok";
+		$len = "length";
+		$obj->$len = $i;
+	}
+	closeDBConnection($link);
+	tell(json_encode($obj));
+}
+
+
+function generateUniqueUserId() {
+	$link = getDBConnection();
+	if (!$link) {
+    	return '{"connect": 0}';
+	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    return '{"connect": 0}';
+	}	
+
+	
+	$uidSQL = "select uid from users";
+	$res = mysqli_query($link, $uidSQL);
+	$uids = array();
+	while($row = mysqli_fetch_assoc($res)) {
+		tell("pushing:".$row['uid']);
+		array_push($uids, $row['uid']);
+	}
+
+	$valueToUse = -1;
+	while(1) {
+		$newrand = mt_rand(1, 74969);
+		tell("calculated: ".$newrand);
+		if(!in_array($newrand, $uids, true)) {
+			$valueToUse = $newrand;
+			break;
+		}
+	}
+
+	return $valueToUse;
+
+}
+
 
 // doLogin();
-doRegister();
+//doRegister();
+//fetchPendingNotifications();
+//generateUniqueUserId();
 
 
 function tell($data) {
 	echo($data.PHP_EOL);
 }
 
-// function isLoggedIn() {
-// 	if(isset($_SESSION['user_session'])) {
-// 		echo('{"status": "ok"}'.PHP_EOL);
-// 	} else {
-// 		echo('{"status"; "none"}'.PHP_EOL);
-// 	}
-// }
+function isLoggedIn() {
+	if(isset($_SESSION['user_session'])) {
+		echo('{"status": "ok"}'.PHP_EOL);
+	} else {
+		echo('{"status"; "none"}'.PHP_EOL);
+	}
+}
 
 // doLogin();
-// isLoggedIn();
+//isLoggedIn();
 
 
 //Comment everything but the line below to see the php version you are running in the browser.
 // phpinfo();
+
+
+
+
+function confirmApprovalForApplier() {
+	$link = getDBConnection();
+	if (!$link) {
+    	return '{"connect": 0}';
+	}
+
+	if (!mysqli_select_db($link, 'timetableci')) {
+	    return '{"connect": 0}';
+	}	
+
+	//first check if this user is in the registration list or not
+	//if yes, then transfer over to the users list with mod permission
+	//else skip quietly on the page.
+	$username = 's';
+	$checkuserSQL = "SELECT * from registrations WHERE username='$username'";
+	$res = mysqli_query($link, $checkuserSQL);
+	$result = (!$res || (mysqli_num_rows($res))==0)?0:(mysqli_num_rows($res));
+
+	$obj = (object) [];
+	$status = "status";
+	//transfer the content data to the users table
+	$usname = "username";
+	$firstname = "firstname";
+	$lastname = "lastname";
+	$password = "password";
+	$perm = "moderator";
+
+	if($result == 0 || $result > 1) {
+		//simply ignore
+		$obj->$status = "ok";
+	} else {
+		$row = mysqli_fetch_assoc($res);
+		//also check if this mail id is already present in the registered user
+		$csql = "SELECT * from users WHERE username='$row[$usname]'";
+		$cres = mysqli_query($link, $csql);
+		$cresult = (!$cres || (mysqli_num_rows($cres))==0)?0:(mysqli_num_rows($cres));
+
+		if($cresult == 0) {
+			$uniqueUID = generateUniqueUserId($link);
+			$insertUserSQL = "INSERT into users (uid, username, password, firstname, lastname, permission) VALUES ('$uniqueUID', '$row[$usname]', '$row[$password]', '$row[$firstname]', '$row[$lastname]', '$perm')";
+			$insres = mysqli_query($link, $insertUserSQL);
+
+			if(!$insres) {
+				$obj->$status = "noins";
+			} else {
+				//remove from the registrations table
+				$delsql = "DELETE FROM registrations WHERE username='$username'";
+				$delres = mysqli_query($link, $delsql);
+				$obj->$status = "ok";
+			}
+
+		} else {
+			//simply ignore
+			$obj->$status = "ok";
+		}
+
+
+	}
+	closeDBConnection($link);
+	tell(json_encode($obj));
+}
+
+
+confirmApprovalForApplier();
 
 ?>
