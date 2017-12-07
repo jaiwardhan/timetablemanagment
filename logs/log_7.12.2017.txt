@@ -1,0 +1,563 @@
+jaz, jazzUser: ::1 - December 7, 2017, 2:17 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:17 am
+Login attempt
+username=jai@g.com
+password=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:17 am
+Login success
+username=jai@g.com
+password=root
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:17 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:17 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:18 am
+Logout success
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:18 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:18 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:18 am
+TT view = success
+btech1
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+TT view = success
+btech1
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+Login attempt
+username=jbz@g.com
+password=prof
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+Login success
+username=jbz@g.com
+password=prof
+rights=moderator
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:19 am
+TT view = success
+btech1
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:20 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:20 am
+Insert-Overwrite Time table attempt
+couse=btech1
+day=MON
+schedule=["BCME","BCME","BCME","BCME","BCME","BCME","BCME","BCME"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:20 am
+overwrite Time table success
+level=moderator
+couse=btech1
+day=MON
+schedule=["BCME","BCME","BCME","BCME","BCME","BCME","BCME","BCME"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:20 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:22 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:22 am
+Insert-Overwrite Time table attempt
+couse=btech1
+day=MON
+schedule=["BCME","BCME","BCME","BCME","BCME","BCME","BCME","BCME"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:22 am
+overwrite Time table success
+uid=73103
+level=moderator
+couse=btech1
+day=MON
+schedule=["BCME","BCME","BCME","BCME","BCME","BCME","BCME","BCME"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:22 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:23 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:23 am
+Insert-Overwrite Time table attempt
+couse=barch5
+day=MON
+schedule=["BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:23 am
+Upload Time table failed
+level=moderator
+couse=barch5
+day=MON
+schedule=["BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+Insert-Overwrite Time table attempt
+couse=barch5
+day=MON
+schedule=["BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+Upload Time table failed
+level=moderator
+couse=barch5
+day=MON
+schedule=["BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC","BARABC"]
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+Logout success
+uid=73103
+rights=moderator
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+Login attempt
+username=jai@g.com
+password=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+Login success
+username=jai@g.com
+password=root
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:24 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:25 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:25 am
+PENDING_REQ_FETCH
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:25 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:25 am
+Logout success
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:26 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:26 am
+USER_REGISTER_ATTEMP
+START_ATTEMPT
+username=jai@g.com
+password=root1
+firstname=jai
+lastName=wardhan
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:26 am
+USER_REGISTER_ATTEMP
+USER_ALREADY_REGISTERED
+username=jai@g.com
+password=root1
+firstname=jai
+lastName=wardhan
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:26 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:27 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:27 am
+USER_REGISTER_ATTEMP
+START_ATTEMPT
+username=bhaiyavishal@g.com
+password=vs123
+firstname=vishal
+lastName=bhaiya
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:27 am
+USER_REGISTER_ATTEMP
+START_NOT_IN_USERS
+username=bhaiyavishal@g.com
+password=vs123
+firstname=vishal
+lastName=bhaiya
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:27 am
+USER_REGISTER_ATTEMP
+START_NOT_IN_REGISTERPDN
+username=bhaiyavishal@g.com
+password=vs123
+firstname=vishal
+lastName=bhaiya
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:27 am
+USER_REGISTER_ATTEMP
+ATTEMPT_SUCC
+username=bhaiyavishal@g.com
+password=vs123
+firstname=vishal
+lastName=bhaiya
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:27 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+USER_REGISTER_ATTEMP
+START_ATTEMPT
+username=vsh@gmail.com
+password=vs123
+firstname=vishal
+lastName=shrivastava
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+USER_REGISTER_ATTEMP
+START_NOT_IN_USERS
+username=vsh@gmail.com
+password=vs123
+firstname=vishal
+lastName=shrivastava
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+USER_REGISTER_ATTEMP
+START_NOT_IN_REGISTERPDN
+username=vsh@gmail.com
+password=vs123
+firstname=vishal
+lastName=shrivastava
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+USER_REGISTER_ATTEMP
+ATTEMPT_SUCC
+username=vsh@gmail.com
+password=vs123
+firstname=vishal
+lastName=shrivastava
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:31 am
+Login attempt
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:35 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:35 am
+LOGIN_ATTEMPT
+ATTEMPT_START
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:35 am
+Login attempt
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:35 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:35 am
+LOGIN_ATTEMPT
+ATTEMPT_START
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:35 am
+Login attempt
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+LOGIN_ATTEMPT
+ATTEMPT_START
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+LOGIN_ATTEMPT
+ATTEMPT_REJECT
+username=vsh@gmail.com
+password=vs123
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+LOGIN_ATTEMPT
+ATTEMPT_START
+username=jai@g.com
+password=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+LOGIN_ATTEMPT
+ATTEMPT_SUCC
+username=jai@g.com
+password=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+PENDING_REQ_FETCH
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:36 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:39 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:39 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:39 am
+PENDING_REQ_FETCH
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:39 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:41 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:42 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:43 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:43 am
+LOGOUT_ATTEMPT
+ATTEMPT_SUCC
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+LOGIN_ATTEMPT
+ATTEMPT_START
+username=jai@g.com
+password=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+LOGIN_ATTEMPT
+ATTEMPT_SUCC
+username=jai@g.com
+password=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+Admin check
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+PENDING_REQ_FETCH
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+DB-ACCESS_CLOSE
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+DB-ACCESS_ATTEMPT
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+REDG_CONF_ATTEMPT
+START_ATTEMPT
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+REDG_CONF_ATTEMPT
+DB_WRITE_PASS
+confirmed_uid=19126
+uid=1
+rights=root
+------------------------------------------
+
+User: ::1 - December 7, 2017, 2:44 am
+DB-ACCESS_CLOSE
+------------------------------------------
+

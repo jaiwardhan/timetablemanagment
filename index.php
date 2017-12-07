@@ -53,7 +53,7 @@
 		  <ul>
 			<li id="login">
 			  <a id="login-trigger" href="#">
-				Admin Login <span></span>
+				Member Login <span></span>
 			  </a>
 			  <div id="login-content">
 			  	<!-- we are going to use the form element to get

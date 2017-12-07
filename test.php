@@ -417,6 +417,24 @@ function confirmApprovalForApplier() {
 }
 
 
-confirmApprovalForApplier();
+//confirmApprovalForApplier();
+
+
+// function logtest(...$t) {
+// 	$i=0;
+// 	while($i < sizeof($t)) {
+// 		tell($t[$i]);
+// 		$i++;
+// 	}
+// }
+
+
+
+
+// logtest(1,2,3,4,5,"asdfasdfasd", 2.343);
+
+
+$log = "jaz, jazz";
+file_put_contents('./logs/log_'.date("j.n.Y").'.txt', $log, FILE_APPEND);
 
 ?>

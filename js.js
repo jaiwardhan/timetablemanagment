@@ -787,6 +787,7 @@ function sendApprovalToServer() {
 		var userDiv = document.getElementById('pending'+idx);
 		if(res['status']=="ok") {
 			userDiv.className = 'alert alert-success';
+			confirmToaster("User Membership Confirmed");
 		} else {
 			userDiv.className = 'alert alert-block';
 		}
@@ -816,6 +817,7 @@ function sendRejectionToServer() {
 		var userDiv = document.getElementById('pending'+idx);
 		if(res['status']=="ok") {
 			userDiv.className = 'alert alert-error';
+			confirmToaster("User Membership Rejected");
 		} else {
 			userDiv.className = 'alert alert-block';
 		}
